@@ -4,11 +4,7 @@ Tested on Python 3.8.
 
 How to use:
 
-.. code-block:: python
-
     pip install pandas matplotlib
-
-.. code-block:: python
 
     from netflix_analysis import cleanup, filtering_data, calculation
 
