@@ -1,30 +1,32 @@
 import pandas as pnd  # importing pandas library.
 import matplotlib  # importing matplotlib to be able to make charts.
 
+def cleanup(csv_name):
+    # creating a table with data from csv through pandas
+    data_frame = pnd.read_csv(csv_name)
+    # updating the data frame removing unnecessary columns with the method .drop()
+    new_data_frame = data_frame.drop(
+      ['Attributes', 'Supplemental Video Type', 'Device Type', 'Bookmark', 'Latest Bookmark'],
+      axis=1
+    )
+    # we check the data types for each column in dataframe (Pandas sees them as objects-strings). We convert them in Datetime and Timedelta in Pandas
+    print(data_frame.dtypes)
+    new_data_frame['Start Time'] = pnd.to_datetime(new_data_frame['Start Time'], utc=True)
+    # check afterwards that data types have been converted
+    print(new_data_frame.dtypes)
+    # convert datetimes to the appropriate timezone using .tz_convert 
+    # but before we need to set Start Time as rhe index .set_index()
+    new_data_frame = new_data_frame.set_index('Start Time')
+    new_data_frame.index = new_data_frame.index.tz_convert('Europe/London')
+    # resetting the index so that Start Time is a column again
+    new_data_frame =  new_data_frame.reset_index()
+    print(new_data_frame.head(1))
+    # Duration: converting it to a timedelta, 
+    # which is a measure of time duration that pandas understands.
+    new_data_frame['Duration'] = pnd.to_timedelta(new_data_frame['Duration'])
+    print(new_data_frame.dtypes)
 
-# creating a table with data from csv through pandas
-data_frame = pnd.read_csv('ViewingActivity.csv')
-# updating the data frame removing unnecessary columns with the method .drop()
-new_data_frame = data_frame.drop(
-  ['Attributes', 'Supplemental Video Type', 'Device Type', 'Bookmark', 'Latest Bookmark'],
-  axis=1
-)
-# we check the data types for each column in dataframe (Pandas sees them as objects-strings). We convert them in Datetime and Timedelta in Pandas
-print(data_frame.dtypes)
-data_frame['Start Time'] = pnd.to_datetime(data_frame['Start Time'], utc=True)
-# check afterwards that data types have been converted
-print(data_frame.dtypes)
-# convert datetimes to the appropriate timezone using .tz_convert 
-# but before we need to set Start Time as rhe index .set_index()
-data_frame = data_frame.set_index('Start Time')
-data_frame.index = data_frame.index.tz_convert('Europe/London')
-# resetting the index so that Start Time is a column again
-data_frame =  data_frame.reset_index()
-print(data_frame.head(1))
-# Duration: converting it to a timedelta, 
-# which is a measure of time duration that pandas understands.
-data_frame['Duration'] = pnd.to_timedelta(data_frame['Duration'])
-print(data_frame.dtypes)
+    return new_data_frame
 
 
 # filtering Better Call Saul views strings by substrings in Pandas str.contains()
